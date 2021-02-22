@@ -1,29 +1,65 @@
 from flask import Flask, make_response, request
 from json import loads
+from random import randint
 from DatabaseController import *
 
 app: Flask = Flask(__name__, template_folder="templates")
+admin_password = "admin123"
 
 
-def database_init():
+def database_init() -> None:
     license_db = DatabaseController("licences.sql")
     account_db = DatabaseController("accounts.sql")
 
     account_db.create_table("accounts", "username TEXT, password TEXT, license_key TEXT")
     license_db.create_table("licences", "key TEXT, uses INT")
 
-    license_db.close()
-    account_db.close()
+
+def is_data_missing(data: List[str], list_of_needed_data: List[str]) -> bool:
+    for needed_data in list_of_needed_data:
+        try:
+            data[needed_data]
+        except KeyError:
+            return True
+        except:
+            pass
+
+    return False
 
 
-@app.route("/", methods=["GET"])
+def create_new_license() -> str:
+    new_license = ""
+
+    for i in range(10):
+        new_license += str(randint(0, 9))
+
+        if i == 4:
+            new_license += "-"
+
+    for line in DatabaseController("licences.sql").get_table("licences"):
+        if new_license == line[1]:
+            new_license = create_new_license()
+
+    return new_license
+
+
+@app.route("/", methods=["GET", "POST", "PUT"])
 def mapping_():
-    return "Not valid mapping url"
+    return make_response(
+        "Not valid mapping url",
+        404
+    )
 
 
 @app.route("/register/", methods=["POST"])
-def mapping_register():
+def mapping_register() -> None:
     data = loads(request.get_data().decode())
+
+    if is_data_missing(data, ["username", "password", "license_key"]):
+        return make_response(
+            "Missing data",
+            400
+        )
 
     l_db = DatabaseController("licences.sql")
     a_db = DatabaseController("accounts.sql")
@@ -31,15 +67,25 @@ def mapping_register():
     for account_ in a_db.get_table("accounts"):
         if account_[0] == data["username"] and account_[1] == data["password"] and account_[2] == data["license_key"]:
             return make_response(
-                "Register unsuccessful because user already exists",
-                400
+                "User already exists",
+                401
             )
 
     for license_ in l_db.get_table("licences"):
         if data["license_key"] == license_[0] and int(license_[1]) > 0:
+            uses = int(l_db.get_value("licences", "uses", "key='" + data["license_key"] + "'")[0][0])
+
+            if uses <= 0:
+                return make_response(
+                    "License invalid",
+                    403
+                )
+
             a_db.add_line("accounts", "(username, password, license_key)",
                           "'" + data["username"] + "', " + "'" + data["password"] + "', " + "'" + data[
                               "license_key"] + "'")
+
+            l_db.update_line("licences", "uses=" + str(uses - 1), "key='" + data["license_key"] + "'")
 
             return make_response(
                 "Register successful",
@@ -47,14 +93,20 @@ def mapping_register():
             )
 
     return make_response(
-        "Register unsuccessful because license key isn't valid",
-        400
+        "License invalid",
+        403
     )
 
 
 @app.route("/login/", methods=["POST"])
-def mapping_login():
+def mapping_login() -> None:
     data = loads(request.get_data().decode())
+
+    if is_data_missing(data, ["username", "password"]):
+        return make_response(
+            "Missing data",
+            400
+        )
 
     a_db = DatabaseController("accounts.sql")
 
@@ -64,8 +116,8 @@ def mapping_login():
             not_equal_usernames_length += 1
     if not_equal_usernames_length == len(a_db.get_table("accounts")):
         return make_response(
-            "Login unsuccessful because user doesn't exist",
-            400
+            "User doesn't exist",
+            401
         )
 
     for account_ in a_db.get_table("accounts"):
@@ -76,7 +128,72 @@ def mapping_login():
             )
 
     return make_response(
-        "Login unsuccessful because password is wrong",
+        "Wrong password",
+        402
+    )
+
+
+@app.route("/create-license/", methods=["POST"])
+def mapping_create_license() -> None:
+    data = loads(request.get_data().decode())
+
+    if is_data_missing(data, ["admin-password"]):
+        return make_response(
+            "Missing data",
+            400
+        )
+
+    try:
+        data["uses"]
+    except KeyError:
+        data["uses"] = 1
+
+    l_db = DatabaseController("licences.sql")
+
+    if data["admin-password"] == admin_password:
+        new_license = create_new_license()
+
+        l_db.add_line("licences", "(key, uses)", "'" + new_license + "', " + str(data["uses"]))
+
+        return make_response(
+            "Create successful, license is: " + new_license,
+            200
+        )
+
+    return make_response(
+        "Wrong admin password",
+        402
+    )
+
+
+@app.route("/check-license/", methods=["POST"])
+def mapping_check_license():
+    data = loads(request.get_data().decode())
+
+    if is_data_missing(data, ["license_key"]):
+        return make_response(
+            "Missing data",
+            400
+        )
+
+    l_db = DatabaseController("licences.sql")
+
+    for license_ in l_db.get_table("licences"):
+        if license_[0] == data["license_key"]:
+            uses = int(l_db.get_value("licences", "uses", "key='" + data["license_key"] + "'")[0][0])
+
+            if uses <= 0:
+                return make_response(
+                    "License valid with 0 uses"
+                )
+
+            return make_response(
+                "License valid",
+                200
+            )
+
+    return make_response(
+        "License invalid",
         400
     )
 

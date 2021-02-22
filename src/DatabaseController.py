@@ -7,6 +7,9 @@ class DatabaseController:
         self.connection = sqlite3.connect(database)
         self.cursor = self.connection.cursor()
 
+    def __del__(self):
+        self.close()
+
     def create_table(self, table_name: str, values: str) -> None:
         self.cursor.execute("CREATE TABLE IF NOT EXISTS " + table_name + " (" + values + ");")
         self.connection.commit()
@@ -19,8 +22,12 @@ class DatabaseController:
         self.cursor.execute("SELECT * FROM " + table_name + ";")
         return self.cursor.fetchall()
 
-    def get_line(self, table_name: str, keys: str) -> List[List[Optional[Union[str, int]]]]:
-        self.cursor.execute("SELECT * FROM " + table_name + " WHERE " + keys + ";")
+    def get_line(self, table_name: str, line_key: str) -> List[List[Optional[Union[str, int]]]]:
+        self.cursor.execute("SELECT * FROM " + table_name + " WHERE " + line_key + ";")
+        return self.cursor.fetchall()
+
+    def get_value(self, table_name: str, key_to_value: str, key_to_line: str) -> Optional[Union[str, int]]:
+        self.cursor.execute("SELECT " + key_to_value + " FROM " + table_name + " WHERE " + key_to_line)
         return self.cursor.fetchall()
 
     def add_line(self, table_name: str, keys: str, values: str) -> None:

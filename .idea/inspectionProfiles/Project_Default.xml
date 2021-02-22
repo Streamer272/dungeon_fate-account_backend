@@ -1,0 +1,74 @@
+<component name="InspectionProjectProfileManager">
+  <profile version="1.0">
+    <option name="myName" value="Project Default" />
+    <inspection_tool class="DuplicatedCode" enabled="true" level="WEAK WARNING" enabled_by_default="true">
+      <Languages>
+        <language minSize="331" name="Python" />
+      </Languages>
+    </inspection_tool>
+    <inspection_tool class="JsonStandardCompliance" enabled="false" level="ERROR" enabled_by_default="false" />
+    <inspection_tool class="PyArgumentListInspection" enabled="false" level="WARNING" enabled_by_default="false" />
+    <inspection_tool class="PyBroadExceptionInspection" enabled="false" level="WEAK WARNING" enabled_by_default="false" />
+    <inspection_tool class="PyPep8Inspection" enabled="true" level="WEAK WARNING" enabled_by_default="true">
+      <option name="ignoredErrors">
+        <list>
+          <option value="E501" />
+          <option value="E722" />
+        </list>
+      </option>
+    </inspection_tool>
+    <inspection_tool class="PyTypeCheckerInspection" enabled="false" level="WARNING" enabled_by_default="false" />
+    <inspection_tool class="PyUnresolvedReferencesInspection" enabled="false" level="WARNING" enabled_by_default="false">
+      <option name="ignoredIdentifiers">
+        <list>
+          <option value="main.CustomClient.get_user_info" />
+          <option value="src.commands.create_project.clone_path" />
+          <option value="src.commands.create_project.global_functions" />
+          <option value="src.commands.add_modules.get_directory_content" />
+          <option value="src.commands.add_modules.global_functions" />
+          <option value="src.commands.add_modules.clone_path" />
+          <option value="src.commands.build.global_functions" />
+          <option value="src.commands.build.add_modules" />
+          <option value="src.commands.build.commands" />
+          <option value="src.commands.add_modules.is_pip_installed" />
+          <option value="object.join" />
+          <option value="src.Player.Player.Global_Functions" />
+          <option value="src.Player.Player.Canvas" />
+          <option value="src.Player.Player.UP" />
+          <option value="src.Player.Player.PhotoImage" />
+          <option value="src.Player.Player.Thread" />
+          <option value="src.Player.Player.RIGHT" />
+          <option value="src.Player.Player.DOWN" />
+          <option value="src.Player.Player.LEFT" />
+          <option value="src.Player.Player.sleep" />
+          <option value="src.Player.Player.N" />
+          <option value="src.Enemy.Enemy.Thread" />
+          <option value="src.Enemy.Enemy.Canvas" />
+          <option value="src.Enemy.Enemy.Player" />
+          <option value="src.Enemy.Enemy.sleep" />
+          <option value="src.Enemy.Enemy.PhotoImage" />
+          <option value="src.Enemy.Enemy.N" />
+          <option value="src.main.Thread" />
+          <option value="src.main.Tk" />
+          <option value="src.main.Canvas" />
+          <option value="src.main.Player" />
+          <option value="src.main.say" />
+          <option value="src.main.sleep" />
+          <option value="src.Player.Knife.Global_Functions" />
+          <option value="src.Player.Knife.PhotoImage" />
+          <option value="src.Player.Knife.Canvas" />
+          <option value="src.Player.Knife.Thread" />
+          <option value="src.Player.Knife.sleep" />
+          <option value="src.Player.Knife.N" />
+          <option value="src.Player.Knife.LEFT" />
+          <option value="src.Player.Knife.DOWN" />
+          <option value="src.Player.Knife.RIGHT" />
+          <option value="src.Player.Knife.UP" />
+          <option value="src.Player.Player.Knife" />
+          <option value="src.Player.Player.Player" />
+          <option value="src.Player.Knife.Player" />
+        </list>
+      </option>
+    </inspection_tool>
+  </profile>
+</component>

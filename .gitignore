@@ -2,3 +2,4 @@
 .vs
 .vscode
 identifier.sqlite
+__pycache__
