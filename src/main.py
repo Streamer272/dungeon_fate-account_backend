@@ -15,14 +15,24 @@ def database_init() -> None:
     license_db.create_table("licences", "key TEXT, uses INT")
 
 
+def is_sql_injection(string: str, allowed_spaces: bool = False, equals_allowed: bool = False) -> bool:
+    if "'" in string:
+        return True
+
+    elif ";" in string:
+        return True
+
+    if " " in string and not allowed_spaces:
+        return True
+
+    if "=" in string and not equals_allowed:
+        return True
+
+
 def is_data_missing(data: List[str], list_of_needed_data: List[str]) -> bool:
     for needed_data in list_of_needed_data:
-        try:
-            data[needed_data]
-        except KeyError:
+        if needed_data not in data:
             return True
-        except:
-            pass
 
     return False
 
@@ -55,6 +65,13 @@ def mapping_():
 def mapping_register() -> None:
     data = loads(request.get_data().decode())
 
+    for piece in data:
+        if is_sql_injection(data[piece], False, False):
+            return make_response(
+                "Trying SQL injection? Nerd...",
+                500
+            )
+
     if is_data_missing(data, ["username", "password", "license_key"]):
         return make_response(
             "Missing data",
@@ -65,7 +82,7 @@ def mapping_register() -> None:
     a_db = DatabaseController("accounts.sql")
 
     for account_ in a_db.get_table("accounts"):
-        if account_[0] == data["username"] and account_[1] == data["password"] and account_[2] == data["license_key"]:
+        if account_[0] == data["username"]:
             return make_response(
                 "User already exists",
                 401
@@ -102,6 +119,13 @@ def mapping_register() -> None:
 def mapping_login() -> None:
     data = loads(request.get_data().decode())
 
+    for piece in data:
+        if is_sql_injection(data[piece], False, False):
+            return make_response(
+                "Trying SQL injection? Nerd...",
+                500
+            )
+
     if is_data_missing(data, ["username", "password"]):
         return make_response(
             "Missing data",
@@ -137,6 +161,13 @@ def mapping_login() -> None:
 def mapping_create_license() -> None:
     data = loads(request.get_data().decode())
 
+    for piece in data:
+        if is_sql_injection(data[piece], False, False):
+            return make_response(
+                "Trying SQL injection? Nerd...",
+                500
+            )
+
     if is_data_missing(data, ["admin-password"]):
         return make_response(
             "Missing data",
@@ -169,6 +200,13 @@ def mapping_create_license() -> None:
 @app.route("/check-license/", methods=["POST"])
 def mapping_check_license():
     data = loads(request.get_data().decode())
+
+    for piece in data:
+        if is_sql_injection(data[piece], False, False):
+            return make_response(
+                "Trying SQL injection? Nerd...",
+                500
+            )
 
     if is_data_missing(data, ["license_key"]):
         return make_response(
